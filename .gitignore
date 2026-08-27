@@ -1,0 +1,4 @@
+# Generated simulation artifacts
+**/sim/**/*.vvp
+**/sim/**/*.vcd
+**/sim/**/*.log

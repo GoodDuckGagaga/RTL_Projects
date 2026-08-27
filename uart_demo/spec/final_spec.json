@@ -1,0 +1,99 @@
+{
+  "architecture_name": "uart_tx_50m_9600",
+  "overview": "Minimal UART transmitter for 50MHz clock, 9600 baud, 8N1 frame. Triggered by tx_en, signals completion via tx_done. All outputs registered.",
+  "top_module": "uart_tx",
+  "modules": [
+    {
+      "name": "uart_tx",
+      "purpose": "Convert 8-bit parallel data to a serial UART frame (1 start, 8 data LSB-first, 1 stop) at 9600 baud using a 50MHz system clock.",
+      "ports": [
+        {
+          "name": "clk",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "rst_n",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "tx_en",
+          "direction": "input",
+          "width": 1
+        },
+        {
+          "name": "tx_data",
+          "direction": "input",
+          "width": 8
+        },
+        {
+          "name": "tx_out",
+          "direction": "output",
+          "width": 1
+        },
+        {
+          "name": "tx_done",
+          "direction": "output",
+          "width": 1
+        }
+      ],
+      "internal_behavior": "FSM with states IDLE, START, DATA, STOP. 13-bit baud counter counts 0 to 5207, asserting bit_tick for 1 cycle per bit period. Baud counter resets to 0 when tx_en is asserted in IDLE. 4-bit bit counter tracks frame progress (0-9). 8-bit shift register loads tx_data when tx_en is high in IDLE (load priority over shift). Shifts LSB-first on bit_tick during DATA state. tx_out and tx_done are registered outputs to prevent combinational glitches. tx_out register is driven by state: IDLE=1, START=0, DATA=shift_reg[0], STOP=1. tx_done register pulses high for 1 cycle when FSM transitions from STOP to IDLE. tx_en is sampled only in IDLE; when high, FSM transitions to START, baud counter resets, and bit counter resets to 0.",
+      "reset_behavior": "Asynchronous active-low rst_n forces FSM to IDLE, clears baud and bit counters to 0, clears shift register, sets tx_out=1, and tx_done=0.",
+      "default_behavior": "Line remains high (idle) when not transmitting. tx_en is ignored during active transmission. tx_done remains low except for a single-cycle pulse at frame completion."
+    }
+  ],
+  "design_steps": [
+    {
+      "step": 1,
+      "step_id": "step_01_unnamed_module",
+      "module": "unnamed_module",
+      "description": "Implement complete uart_tx module with registered outputs, explicit load/shift priority, and baud counter reset logic.",
+      "dependencies": [],
+      "priority": "medium",
+      "verification": [],
+      "deliverables": [],
+      "hierarchy_level": 0,
+      "child_modules": [],
+      "parent_modules": []
+    },
+    {
+      "step": 2,
+      "step_id": "step_02_uart_tx",
+      "module": "uart_tx",
+      "description": "Implement and verify uart_tx",
+      "dependencies": [],
+      "priority": "medium",
+      "verification": [],
+      "deliverables": [],
+      "hierarchy_level": 0,
+      "child_modules": [],
+      "parent_modules": []
+    }
+  ],
+  "constraints": {
+    "language": "Verilog-2001",
+    "clock_freq_mhz": 50,
+    "baud_rate": 9600,
+    "baud_counter_limit": 5207,
+    "frame_format": "1 start(0), 8 data(LSB-first), 1 stop(1)",
+    "assumptions": [
+      "tx_en is level-sensitive but sampled only in IDLE to prevent mid-frame retriggering",
+      "rst_n is active-low asynchronous reset",
+      "No parity or flow control is implemented per request",
+      "All outputs are registered to prevent glitches"
+    ]
+  },
+  "module_hierarchy": {
+    "unnamed_module": {
+      "children": [],
+      "parents": [],
+      "level": 0
+    },
+    "uart_tx": {
+      "children": [],
+      "parents": [],
+      "level": 0
+    }
+  }
+}
