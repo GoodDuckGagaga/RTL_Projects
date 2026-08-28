@@ -22,6 +22,8 @@ driver-enable output.
 
 The detailed architecture, configuration rules, timing strategy, and
 integration guidance are in [docs/design.md](docs/design.md).
+Application boundaries, port-level instructions, integration examples, and
+deployment checklists are in [docs/usage.md](docs/usage.md).
 
 ## Directory layout
 
